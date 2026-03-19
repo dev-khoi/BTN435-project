@@ -4,9 +4,143 @@
 
 
 ## Project Title: Smart Home Network Automation System
+## PROJECT STRUCTURE
+--
+## Repository Structure
+
+```
+BTN435-project/
+├── network/                  # Khoi — subnetting, routing, ARP
+│   ├── topology.md           # Network diagram + subnet table
+│   ├── routing_table.txt     # Static routing entries
+│   └── src/
+│       ├── server.cpp        # Multithreaded C++ server
+│       ├── server.h
+│       └── arp_handler.cpp   # ARP resolution logic
+│
+├── app/                      # Zlata — client + protocol
+│   ├── protocol/
+│   │   └── SPEC.md           # ← SHARED CONTRACT (read before coding)
+│   └── client/
+│       ├── client.cpp        # TCP socket client
+│       └── client.h
+│
+├── devices/                  # Bay — device simulation + tests
+│   ├── simulation/
+│   │   ├── light.cpp
+│   │   ├── thermostat.cpp
+│   │   └── camera.cpp
+│   └── tests/
+│       ├── unit/
+│       └── integration/
+│
+├── report/                   # Shared — each member adds their sections. Reports can be done in google Docs, ignore for now.
+│   ├── 00_overview.md        # Written together at kickoff
+│   ├── 01_network_architecture.md     # Khoi
+│   ├── 02_protocol_implementation.md  # Zlata
+│   ├── 03_testing_challenges.md       # Bay
+│   └── 04_code_walkthrough.md         # All three contribute
+│
+└── README.md
+```
+
+
+### Khoi — Network & Server Lead
+
+**Own:** `network/`
+
+**Responsibilities:**
+
+- Design the subnet topology using VLSM (minimum 3 subnets: lighting, thermostat, security)
+- Document all subnets, IP ranges, and subnet masks in `network/topology.md`
+- Implement static routing between subnets
+- Implement ARP resolution in `arp_handler.cpp`
+- Build the core multithreaded C++ server in `server.cpp`
+  - Accept multiple simultaneous TCP client connections
+  - Dispatch incoming commands to the correct device handler thread
+  - Use mutexes to protect shared device state
+
+**Do not modify:** `app/`, `devices/` — coordinate via the protocol spec instead.
+
+**Definition of done:**
+
+- Server compiles and binds to a configurable port
+- At least 3 subnets documented with correct VLSM masks
+- ARP table populates on startup and resolves IP → MAC
+- Server handles at least 3 concurrent clients without crashing
 
 ---
 
+### Zlata — Client & Protocol Lead
+
+**Own:** `app/`
+
+**Responsibilities:**
+
+- Define the HTTP-like application protocol in `app/protocol/SPEC.md` — **do this first, in week 1**
+  - Document all supported commands: `GET /light/on`, `GET /thermostat/set/22`, `GET /camera/status`, etc.
+  - Document response format: status code, message body
+- Implement the TCP socket client in `client.cpp`
+  - Connect to the server using a configurable IP + port
+  - Accept text commands from the user via stdin
+  - Display server responses clearly
+- Write `report/02_protocol_implementation.md`
+
+**Do not modify:** `network/src/`, `devices/simulation/` — use the protocol spec as the boundary.
+
+**Definition of done:**
+
+- `SPEC.md` reviewed and acknowledged by Khoi and Bay before any coding begins
+- Client connects, sends a command, and prints the server response
+- All commands in the spec are implemented on the client side
+
+---
+
+### Bay — Devices & Testing Lead
+
+**Own:** `devices/`
+
+**Responsibilities:**
+
+- Implement one source file per device: `light.cpp`, `thermostat.cpp`, `camera.cpp`
+  - Each device runs in its own thread
+  - Device state is protected with a mutex
+  - Devices respond to commands defined in `app/protocol/SPEC.md`
+- Write unit tests for each device (on/off, set value, status query)
+- Write integration tests:
+  - Single client controlling multiple devices
+  - Multiple clients sending simultaneous commands
+  - Device failure / unknown command handling
+- Write `report/03_testing_challenges.md` including test results
+
+**Do not modify:** `network/src/`, `app/client/` — wire devices into the server only via the agreed interface in `SPEC.md`.
+
+**Definition of done:**
+
+- All 3 devices compile, run in threads, and respond to commands correctly
+- Unit tests pass for all devices
+- Integration test demonstrates 3 simultaneous clients without race conditions
+
+---
+
+## Shared Responsibilities (All Three)
+
+| Task | Details |
+| --- | --- |
+| **Kickoff meeting** | Agree on `SPEC.md` together before anyone writes device or client code |
+| **Report intro** | Write `report/00_overview.md` together — objectives, design choices, tech stack |
+| **Code walkthrough** | Each member contributes their section to `report/04_code_walkthrough.md` |
+| **In-class demo** | All three present; each explains their own module |
+| **Final recording** | Each member records 2–3 minutes covering their contribution |
+| **Peer evaluation** | Complete honestly and on time |
+
+---
+
+
+
+---
+## INSTRUCTIONS
+--
 ## Project Overview
 
 This project involves the design and implementation of a smart home network automation system using C++ programming and various networking protocols. The system will allow users to control smart devices (e.g., lights, thermostat, security systems) within a home using networked communication.
