@@ -2,6 +2,7 @@
 
 ## Project (15%)
 
+
 ## Project Title: Smart Home Network Automation System
 
 ---
@@ -129,7 +130,7 @@ Students can earn up to 5 points for implementing additional features that go be
 
 ## Group Work and Collaboration
 
-- This is a group project (3–5 students per group).
+- This is a group project (3–5 students per group).l
 - Every group member should contribute equally to the coding, testing, and writing of the report.
 - Peer evaluations will be used to assess individual contributions.
 
