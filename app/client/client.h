@@ -3,9 +3,16 @@
 
 #include <string>
 
+#ifdef _WIN32
+#include <winsock2.h>
+using ClientSocket = SOCKET;
+#else
+using ClientSocket = int;
+#endif
+
 class Client {
 private: 
-    int clientSocket;
+    ClientSocket clientSocket;
     std::string serverIP;
     int serverPort;
     bool connected;
