@@ -5,20 +5,45 @@
 #include <algorithm>
 #include <cctype>
 #include <cstring>
+
+#ifdef _WIN32
+#include <ws2tcpip.h>
+#pragma comment(lib, "Ws2_32.lib")
+#else
 #include <unistd.h>
 #include <arpa/inet.h>
 #include <sys/socket.h>
+#endif
+
+namespace {
+#ifdef _WIN32
+constexpr ClientSocket kInvalidSocket = INVALID_SOCKET;
+#else
+constexpr ClientSocket kInvalidSocket = -1;
+#endif
+}
 
 Client::Client(const std::string& ip, int port) 
-    : clientSocket(-1), serverIP(ip), serverPort(port), connected(false){}
+    : clientSocket(kInvalidSocket), serverIP(ip), serverPort(port), connected(false){}
 
 Client::~Client(){
     closeConnection();
+#ifdef _WIN32
+    WSACleanup();
+#endif
 }
 
 bool Client::connectToServer() {
+#ifdef _WIN32
+    WSADATA wsaData;
+    if (WSAStartup(MAKEWORD(2, 2), &wsaData) != 0) {
+        std::cerr << "Error: WSAStartup failed.\n";
+        return false;
+    }
+#endif
+
     clientSocket = socket(AF_INET, SOCK_STREAM, 0);
-    if (clientSocket < 0) {
+    if (clientSocket == kInvalidSocket) {
         std::cerr << "Error: Could not create socket.\n";
         return false;
     }
@@ -31,9 +56,8 @@ bool Client::connectToServer() {
             serverIP.c_str(), 
             &serverAddress.sin_addr) 
             <= 0) {
-        std::cerr << "Error: Invalid IP address.\n"
-        close(clientSocket);
-        clientSocket = -1;
+        std::cerr << "Error: Invalid IP address.\n";
+        closeConnection();
         return false;
     }
 
@@ -41,8 +65,7 @@ bool Client::connectToServer() {
             reinterpret_cast<sockaddr*>(&serverAddress), 
             sizeof(serverAddress)) < 0) {
         std::cerr << "Error: Connection to server failed.\n";
-        close(clientSocket);
-        clientSocket = -1;
+        closeConnection();
         return false;
     }
 
@@ -59,10 +82,17 @@ bool Client::sendRequest(const std::string& request) {
 
     std::string requestWithNewline = request + "\n";
 
-    ssize_t bytesSent = send(clientSocket, 
-        requestWithNewline.c_str(), 
-        requestWithNewline.size(), 
+#ifdef _WIN32
+    int bytesSent = send(clientSocket,
+        requestWithNewline.c_str(),
+        static_cast<int>(requestWithNewline.size()),
         0);
+#else
+    ssize_t bytesSent = send(clientSocket,
+        requestWithNewline.c_str(),
+        requestWithNewline.size(),
+        0);
+#endif
     if (bytesSent < 0) {
         std::cerr << "Error: Failed to send request.\n";
         return false;
@@ -79,10 +109,17 @@ std::string Client::receiveResponse() {
     char buffer[1024];
     std::memset(buffer, 0, sizeof(buffer));
 
-    ssize_t bytesReceived = recv(clientSocket, 
-        buffer, 
-        sizeof(buffer) - 1, 
+#ifdef _WIN32
+    int bytesReceived = recv(clientSocket,
+        buffer,
+        static_cast<int>(sizeof(buffer) - 1),
         0);
+#else
+    ssize_t bytesReceived = recv(clientSocket,
+        buffer,
+        sizeof(buffer) - 1,
+        0);
+#endif
     if (bytesReceived < 0) {
         return "Error: Failed to receive response from server.";
     }
@@ -96,9 +133,13 @@ std::string Client::receiveResponse() {
 }
 
 void Client::closeConnection() {
-    if (clientSocket >= 0){
+    if (clientSocket != kInvalidSocket){
+#ifdef _WIN32
+        closesocket(clientSocket);
+#else
         close(clientSocket);
-        clientSocket = -1;
+#endif
+        clientSocket = kInvalidSocket;
     }
     connected = false;
 }
@@ -131,7 +172,7 @@ void Client::run() {
         if (command == "exit" 
             || command == "EXIT" 
             || command == "Exit"){
-            std::cout << "Closing client...\n"l
+            std::cout << "Closing client...\n";
             break;
         }
 
@@ -159,7 +200,7 @@ int main(int argc, char* argv[]) {
     std::string ip = "127.0.0.1";
     int port = 8080;
 
-    if (argv >= 3) {
+    if (argc >= 3) {
         port = std::stoi(argv[2]);
     }
 
