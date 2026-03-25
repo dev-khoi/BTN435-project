@@ -3,6 +3,7 @@
 Light::Light() : isOn(false) {}
 
 std::string Light::handleCommand(const std::string& action){
+    
     std::lock_guard<std::mutex> lock(mtx);
 
     if(action == "on"){

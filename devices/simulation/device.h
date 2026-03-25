@@ -23,7 +23,7 @@ class Device {
             };
 
         virtual std::string handleCommand(const std::string& action, const std::string& value) = 0;
-        virtual std::string handleCmand(const std::string& action) = 0;
+        virtual std::string handleCommand(const std::string& action) = 0;
     
     protected:
         // makeResponse
