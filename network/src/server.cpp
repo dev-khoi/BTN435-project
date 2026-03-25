@@ -260,7 +260,7 @@ std::string Server::dispatchLight(const std::string &action, bool hasValue, int 
         lightQueue.push(std::move(task));
     }
     lightCv.notify_one();
-
+    
     return result.get();
 }
 
@@ -301,7 +301,7 @@ void Server::lightWorker()
         {
             std::unique_lock<std::mutex> lock(lightQueueMutex);
             lightCv.wait(lock, [this]
-                         { return !running.load() || !lightQueue.empty(); });
+                         { return !running.load() || !lghtQueue.empty(); });
             if (lightQueue.empty())
             {
                 continue;
