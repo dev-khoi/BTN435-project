@@ -1,15 +1,32 @@
 #include "camera.h"
 
 camera::camera():isOn(true){}
+
+std::string camera::handleCommand(const std::string& action){
+    std::lock_guard<std::mutex> lock(mtx);
+
+    if (action == "status") {
+        return isOn ? "200 OK\nCamera is active"
+                    : "200 OK\nCamera is inactive";
+    }
+
+    return "400 ERROR\nInvalid camera command";
+}
+
 std::string camera::handleCommand(
     const std::string& action,
     const std::string& value
 ){
-    std::lock_guard<std::mutex> lock(mtx);
-    if (action == "status" ){
-        if (isOn) return "200 OK\nCamera is active"
+    if (!value.empty()) {
+        return "400 ERROR\nCamera command does not take a value";
     }
-    return "400 ERROR\nInvalid Camera command";
+
+    std::lock_guard<std::mutex> lock(mtx);
+    if (action == "status") {
+        return isOn ? "200 OK\nCamera is active"
+                    : "200 OK\nCamera is inactive";
+    }
+    return "400 ERROR\nInvalid camera command";
 }
 
 void camera::run(){

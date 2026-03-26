@@ -10,7 +10,7 @@
 
 
 // i want token to auntenication
-Utils ul;
+inline Utils ul;
 
 class Device {
     private:
@@ -31,7 +31,38 @@ class Device {
             return std::to_string(code) + " " + status + "\n" + body + "\n";
         }
     public:
-        virtual std::string processRequest(const std::string &requestLine);
+        virtual std::string processRequest(const std::string &requestLine) {
+            std::istringstream iss(requestLine);
+            std::string method;
+            std::string path;
+            std::string extra;
+
+            iss >> method >> path;
+            if (method.empty() || path.empty() || (iss >> extra)) {
+                return makeResponse(400, "ERROR", "Invalid command format");
+            }
+
+            method = ul.toLower(method);
+            if (method != "get") {
+                return makeResponse(400, "ERROR", "Only GET is supported");
+            }
+
+            if (path.empty() || path.front() != '/') {
+                return makeResponse(400, "ERROR", "Invalid path");
+            }
+
+            std::vector<std::string> parts = ul.split(path.substr(1), '/');
+            if (parts.size() != 2 && parts.size() != 3) {
+                return makeResponse(400, "ERROR", "Invalid command format");
+            }
+
+            const std::string action = ul.toLower(parts[1]);
+            if (parts.size() == 3) {
+                return handleCommand(action, parts[2]);
+            }
+
+            return handleCommand(action);
+        }
         virtual void run() = 0;
         virtual ~Device() {};
 };
