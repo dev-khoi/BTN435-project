@@ -24,6 +24,6 @@ Remaining space:
 
 ## Logical Topology
 
-- One Linux router or server host with 3 interfaces, one per subnet.
+- One router or server host with 3 interfaces, one per subnet.
 - Client or devices will stay in its own subnet, and send the traffic to their subnet gateway
 - Client or devices in different subnet will be able to communicate as the routers or servers are the intermediary between subnets
