@@ -10,6 +10,8 @@
 #include <thread>
 #include <vector>
 
+#include "arp_handler.h"
+
 #ifdef _WIN32
 #define CLOSE_SOCKET(s) closesocket(s)
 #define SHUT_RDWR SD_BOTH
@@ -66,6 +68,8 @@ private:
     std::thread thermostatThread;
     std::thread cameraThread;
 
+    ArpHandler arpHandler;
+
     void acceptLoop();
     void handleClient(int clientSocket);
 
@@ -74,6 +78,7 @@ private:
     std::string dispatchLight(const std::string &action, bool hasValue, int value);
     std::string dispatchThermostat(const std::string &action, bool hasValue, int value);
     std::string dispatchCamera(const std::string &action, bool hasValue, int value);
+    std::string dispatchNetwork(const std::string &action, bool hasValue);
 
     void lightWorker();
     void thermostatWorker();

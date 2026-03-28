@@ -159,6 +159,7 @@ void Client::run() {
     std::cout << "  GET /thermostat/set/22\n";
     std::cout << "  GET /thermostat/status\n";
     std::cout << "  GET /camera/status\n";
+    std::cout << "  GET /network/arp\n";
     std::cout << "Type 'exit' to quit.\n\n";
 
     while (true) {

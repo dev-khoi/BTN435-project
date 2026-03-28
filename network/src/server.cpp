@@ -246,6 +246,10 @@ std::string Server::processRequest(const std::string &requestLine)
     {
         return dispatchCamera(action, hasValue, value);
     }
+    if (device == "network")
+    {
+        return dispatchNetwork(action, hasValue);
+    }
 
     return makeResponse(404, "NOT FOUND", "Unknown device");
 }
@@ -290,6 +294,21 @@ std::string Server::dispatchCamera(const std::string &action, bool hasValue, int
     cameraCv.notify_one();
 
     return result.get();
+}
+
+std::string Server::dispatchNetwork(const std::string &action, bool hasValue)
+{
+    if (hasValue)
+    {
+        return makeResponse(400, "ERROR", "Network command does not take a value");
+    }
+
+    if (action == "arp")
+    {
+        return makeResponse(200, "OK", arpHandler.formatTable());
+    }
+
+    return makeResponse(404, "NOT FOUND", "Unknown network resource");
 }
 
 void Server::lightWorker()

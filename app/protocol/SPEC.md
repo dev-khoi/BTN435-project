@@ -29,7 +29,7 @@ GET /<device>/<action>/<value>
 
 Where:
 
-* `<device>` = light | thermostat | camera
+* `<device>` = light | thermostat | camera | network
 * `<action>` = command to execute
 * `<value>` = optional parameter (used for thermostat)
 
@@ -51,6 +51,10 @@ Where:
 ### Camera Control
 
 * `GET /camera/status` → Get camera status
+
+### Network Diagnostics
+
+* `GET /network/arp` → Get ARP table (IP to MAC mapping)
 
 ---
 
@@ -86,6 +90,14 @@ Temperature set to 22°C
 
 400 ERROR
 Invalid command format
+
+### ARP Table:
+
+200 OK
+ARP Table:
+IP Address       MAC Address          Interface   Status
+192.168.1.10     AA:BB:CC:DD:EE:01   eth0        Resolved
+192.168.2.5      AA:BB:CC:DD:EE:02   eth1        Resolved
 
 ---
 
