@@ -126,7 +126,7 @@ std::string Client::receiveResponse() {
 
     if (bytesReceived == 0) {
         connected = false;
-        return "Server dissconnected.";
+        return "Server disconnected.";
     }
 
     return std::string(buffer);
