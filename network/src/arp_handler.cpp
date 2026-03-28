@@ -6,11 +6,6 @@
 
 ArpHandler::ArpHandler()
 {
-    preloadDefaults();
-}
-
-void ArpHandler::preloadDefaults()
-{
     std::lock_guard<std::mutex> lock(tableMutex);
     table.clear();
 

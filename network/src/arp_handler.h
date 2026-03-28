@@ -19,7 +19,6 @@ class ArpHandler
 public:
     ArpHandler();
 
-    void preloadDefaults();
     void addOrUpdate(const std::string &ip, const std::string &mac, const std::string &interfaceName,
                      const std::string &status = "Resolved");
     std::string resolve(const std::string &ip) const;

@@ -55,6 +55,7 @@ Where:
 ### Network Diagnostics
 
 * `GET /network/arp` → Get ARP table (IP to MAC mapping)
+* `GET /network/routing` → Get server routing table
 
 ---
 
@@ -98,6 +99,14 @@ ARP Table:
 IP Address       MAC Address          Interface   Status
 192.168.1.10     AA:BB:CC:DD:EE:01   eth0        Resolved
 192.168.2.5      AA:BB:CC:DD:EE:02   eth1        Resolved
+
+### Routing Table:
+
+200 OK
+Network          NextHop         Interface   Cost
+192.168.10.0/26  0.0.0.0         eth0        1
+192.168.10.64/27 0.0.0.0         eth1        1
+192.168.10.96/28 0.0.0.0         eth2        1
 
 ---
 

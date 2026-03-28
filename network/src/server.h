@@ -11,6 +11,7 @@
 #include <vector>
 
 #include "arp_handler.h"
+#include "routing_handler.h"
 
 #ifdef _WIN32
 #define CLOSE_SOCKET(s) closesocket(s)
@@ -69,6 +70,7 @@ private:
     std::thread cameraThread;
 
     ArpHandler arpHandler;
+    RoutingHandler routingHandler;
 
     void acceptLoop();
     void handleClient(int clientSocket);

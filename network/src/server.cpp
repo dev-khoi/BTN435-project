@@ -307,6 +307,10 @@ std::string Server::dispatchNetwork(const std::string &action, bool hasValue)
     {
         return makeResponse(200, "OK", arpHandler.formatTable());
     }
+    if (action == "routing")
+    {
+        return makeResponse(200, "OK", routingHandler.formatTable());
+    }
 
     return makeResponse(404, "NOT FOUND", "Unknown network resource");
 }
@@ -542,8 +546,12 @@ std::string Server::makeResponse(int code, const std::string &status, const std:
 
 int main(int argc, char *argv[])
 {
-    // !hardcoded port for simplicity
     int port = 8080;
+
+    if (argc > 1)
+    {
+        port = std::stoi(argv[1]);
+    }
 
     Server server(port);
     if (!server.start())
