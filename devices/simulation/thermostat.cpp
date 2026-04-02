@@ -1,18 +1,18 @@
 #include "thermostat.h"
 
-thermostat::thermostat():temp(21.5){}
+Thermostat::Thermostat():temp(21.5f){}
 
-std::string thermostat::handleCommand(const std::string& action){
+std::string Thermostat::handleCommand(const std::string& action){
     std::lock_guard<std::mutex> lock(mtx);
 
     if (action == "status") {
-        return "200 OK\nthermostat temperature is " + std::to_string(temp);
+        return makeResponse(200, "OK", "Thermostat temperature is " + std::to_string(temp));
     }
 
-    return "400 ERROR\nInvalid thermostat command";
+    return makeResponse(400, "ERROR", "Invalid thermostat command");
 }
 
-std::string thermostat::handleCommand(
+std::string Thermostat::handleCommand(
     const std::string& action,
     const std::string& value
 ){
@@ -20,15 +20,19 @@ std::string thermostat::handleCommand(
 
     if(action == "set"){
         if (value.empty()) {
-            return "400 ERROR\nMissing thermostat value";
+            return makeResponse(400, "ERROR", "Missing thermostat value");
         }
-        temp = std::stof(value);
-        return "200 OK\nthermostat set to " + value;
+        try {
+            temp = std::stof(value);
+        } catch (...) {
+            return makeResponse(400, "ERROR", "Invalid thermostat value");
+        }
+        return makeResponse(200, "OK", "Thermostat set to " + value);
     }
 
-    return "400 ERROR\nInvalid thermostat command";
+    return makeResponse(400, "ERROR", "Invalid thermostat command");
 }
 
-void thermostat::run(){
+void Thermostat::run(){
     
 }

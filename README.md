@@ -127,12 +127,12 @@ BTN435-project/
 
 | Task | Details |
 | --- | --- |
-| **Kickoff meeting** | Agree on `SPEC.md` together before anyone writes device or client code |
-| **Report intro** | Write `report/00_overview.md` together — objectives, design choices, tech stack |
-| **Code walkthrough** | Each member contributes their section to `report/04_code_walkthrough.md` |
-| **In-class demo** | All three present; each explains their own module |
-| **Final recording** | Each member records 2–3 minutes covering their contribution |
-| **Peer evaluation** | Complete honestly and on time |
+| Kickoff meeting | Agree on `SPEC.md` together before anyone writes device or client code. |
+| Report intro | Write `report/00_overview.md` together (objectives, design choices, tech stack). |
+| Code walkthrough | Each member contributes their section to `report/04_code_walkthrough.md`. |
+| In-class demo | All three members present; each explains their own module. |
+| Final recording | Each member records 2-3 minutes covering their contribution. |
+| Peer evaluation | Complete honestly and on time. |
 
 ---
 
@@ -236,18 +236,18 @@ This project involves the design and implementation of a smart home network auto
 
 ## Rubric
 
-| Criteria                                        | Points | Weight   |
-| ----------------------------------------------- | ------ | -------- |
-| Network Design (Subnetting and Routing)         | 5      | 10%      |
-| Multithreaded Client-Server Application         | 10     | 20%      |
-| Application Layer Protocol (HTTP-like)          | 5      | 10%      |
-| Multithreading for Concurrent Device Management | 5      | 10%      |
-| Routing and Network Communication               | 5      | 10%      |
-| In-Class Demonstration                          | 5      | 10%      |
-| Report Quality and Completeness                 | 5      | 10%      |
-| Project Presentation                            | 5      | 10%      |
-| "Above and Beyond" Features                     | 5      | 10%      |
-| **Total**                                       | **50** | **100%** |
+| Criteria | Points | Weight |
+| --- | ---: | ---: |
+| Network Design (Subnetting and Routing) | 5 | 10% |
+| Multithreaded Client-Server Application | 10 | 20% |
+| Application Layer Protocol (HTTP-like) | 5 | 10% |
+| Multithreading for Concurrent Device Management | 5 | 10% |
+| Routing and Network Communication | 5 | 10% |
+| In-Class Demonstration | 5 | 10% |
+| Report Quality and Completeness | 5 | 10% |
+| Project Presentation | 5 | 10% |
+| "Above and Beyond" Features | 5 | 10% |
+| **Total** | **50** | **100%** |
 
 ---
 

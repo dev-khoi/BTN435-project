@@ -2,7 +2,7 @@
 #define CAMERA_H
 #include "device.h"
 
-class camera : public Device {
+class Camera : public Device {
     private:
         bool isOn;
         std::mutex mtx;
@@ -10,7 +10,7 @@ class camera : public Device {
         std::string handleCommand(const std::string& action, const std::string& value) override;
 
     public:
-        camera();
+        Camera();
         void run() override;
 };
 

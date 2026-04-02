@@ -24,10 +24,7 @@ namespace
 Server::Server(int port)
     : serverSocket(-1),
       port(port),
-      running(false),
-      lightOn(false),
-      thermostatTemperature(22),
-      cameraOnline(true) {}
+      running(false) {}
 
 Server::~Server()
 {
@@ -180,11 +177,7 @@ void Server::handleClient(int clientSocket)
         }
     }
 
-#ifdef _WIN32
-    closesocket(serverSocket);
-#else
-    close(serverSocket);
-#endif
+    CLOSE_SOCKET(clientSocket);
 }
 
 std::string Server::processRequest(const std::string &requestLine)
@@ -383,72 +376,32 @@ void Server::cameraWorker()
 
 std::string Server::execLight(const DeviceTask &task)
 {
+    std::string request = "GET /light/" + task.action;
     if (task.hasValue)
     {
-        return makeResponse(400, "ERROR", "Light command does not take a value");
+        request += "/" + std::to_string(task.value);
     }
-
-    if (task.action == "on")
-    {
-        std::lock_guard<std::mutex> lock(stateMutex);
-        lightOn = true;
-        return makeResponse(200, "OK", "Light turned ON");
-    }
-    if (task.action == "off")
-    {
-        std::lock_guard<std::mutex> lock(stateMutex);
-        lightOn = false;
-        return makeResponse(200, "OK", "Light turned OFF");
-    }
-    if (task.action == "status")
-    {
-        std::lock_guard<std::mutex> lock(stateMutex);
-        return makeResponse(200, "OK", lightOn ? "Light is ON" : "Light is OFF");
-    }
-
-    return makeResponse(400, "ERROR", "Unknown light action");
+    return lightDevice.processRequest(request);
 }
 
 std::string Server::execThermostat(const DeviceTask &task)
 {
-    if (task.action == "status")
+    std::string request = "GET /thermostat/" + task.action;
+    if (task.hasValue)
     {
-        if (task.hasValue)
-        {
-            return makeResponse(400, "ERROR", "Status does not take a value");
-        }
-        std::lock_guard<std::mutex> lock(stateMutex);
-        return makeResponse(200, "OK", "Current temperature is " + std::to_string(thermostatTemperature));
+        request += "/" + std::to_string(task.value);
     }
-
-    if (task.action == "set")
-    {
-        if (!task.hasValue)
-        {
-            return makeResponse(400, "ERROR", "Missing temperature value");
-        }
-        std::lock_guard<std::mutex> lock(stateMutex);
-        thermostatTemperature = task.value;
-        return makeResponse(200, "OK", "Temperature set to " + std::to_string(thermostatTemperature));
-    }
-
-    return makeResponse(400, "ERROR", "Unknown thermostat action");
+    return thermostatDevice.processRequest(request);
 }
 
 std::string Server::execCamera(const DeviceTask &task)
 {
+    std::string request = "GET /camera/" + task.action;
     if (task.hasValue)
     {
-        return makeResponse(400, "ERROR", "Camera command does not take a value");
+        request += "/" + std::to_string(task.value);
     }
-
-    if (task.action == "status")
-    {
-        std::lock_guard<std::mutex> lock(stateMutex);
-        return makeResponse(200, "OK", cameraOnline ? "Camera is ONLINE" : "Camera is OFFLINE");
-    }
-
-    return makeResponse(400, "ERROR", "Unknown camera action");
+    return cameraDevice.processRequest(request);
 }
 
 void Server::startWorkers()

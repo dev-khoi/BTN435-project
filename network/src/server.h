@@ -12,6 +12,9 @@
 
 #include "arp_handler.h"
 #include "routing_handler.h"
+#include "../../devices/simulation/light.h"
+#include "../../devices/simulation/thermostat.h"
+#include "../../devices/simulation/camera.h"
 
 #ifdef _WIN32
 #define CLOSE_SOCKET(s) closesocket(s)
@@ -44,11 +47,9 @@ private:
     int port;
     std::atomic<bool> running;
 
-    // shared device states are protected by a mutex
-    bool lightOn;
-    int thermostatTemperature;
-    bool cameraOnline;
-    std::mutex stateMutex;
+    Light lightDevice;
+    Thermostat thermostatDevice;
+    Camera cameraDevice;
     
     std::vector<std::thread> clientThreads;
     std::mutex clientThreadsMutex;

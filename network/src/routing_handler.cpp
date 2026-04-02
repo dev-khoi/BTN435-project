@@ -15,6 +15,25 @@ RoutingHandler::RoutingHandler()
     routes.push_back({"192.168.10.96", 28, "0.0.0.0", "eth2", 1});
 }
 
+void RoutingHandler::addRoute(const std::string &network, int prefixLength, const std::string &nextHop,
+                              const std::string &interfaceName, int cost)
+{
+    std::lock_guard<std::mutex> lock(routesMutex);
+
+    for (RouteEntry &route : routes)
+    {
+        if (route.network == network && route.prefixLength == prefixLength)
+        {
+            route.nextHop = nextHop;
+            route.interfaceName = interfaceName;
+            route.cost = cost;
+            return;
+        }
+    }
+
+    routes.push_back({network, prefixLength, nextHop, interfaceName, cost});
+}
+
 std::vector<RouteEntry> RoutingHandler::getRoutes() const
 {
     std::lock_guard<std::mutex> lock(routesMutex);
@@ -23,6 +42,10 @@ std::vector<RouteEntry> RoutingHandler::getRoutes() const
               { return a.network < b.network; });
     return out;
 }
+
+/*#CORE LOGIC:
+
+*/ 
 
 RouteDecision RoutingHandler::findRoute(const std::string &destinationIp) const
 {

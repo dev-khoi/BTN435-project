@@ -2,7 +2,7 @@
 #define THERMOSTAT_H
 #include "device.h"
 
-class thermostat : public Device {
+class Thermostat : public Device {
     private:
         float temp;
         std::mutex mtx;
@@ -10,7 +10,7 @@ class thermostat : public Device {
         std::string handleCommand(const std::string& action, const std::string& value) override;
 
     public:
-        thermostat();
+        Thermostat();
         void run() override;
 };
 

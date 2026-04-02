@@ -4,23 +4,29 @@
 Light::Light() : isOn(false) {}
 
 std::string Light::handleCommand(const std::string& action){
-    
     std::lock_guard<std::mutex> lock(mtx);
 
     if(action == "on"){
         isOn = true;
-        return "200 OK\nLight turned ON";
+        return makeResponse(200, "OK", "Light turned ON");
     }
     else if (action == "off"){
         isOn = false;
-        return "200 OK\nLight turned OFF";
+        return makeResponse(200, "OK", "Light turned OFF");
     }
     else if (action == "status"){
-        return isOn ? "200 OK\nLight is ON"
-                    : "200 OK\nLight turned OFF";
+        return isOn ? makeResponse(200, "OK", "Light is ON")
+                    : makeResponse(200, "OK", "Light is OFF");
     }
 
-    return "400 ERROR\nInvalid light command";
+    return makeResponse(400, "ERROR", "Invalid light command");
+}
+
+std::string Light::handleCommand(const std::string& action, const std::string& value){
+    if (!value.empty()) {
+        return makeResponse(400, "ERROR", "Light command does not take a value");
+    }
+    return handleCommand(action);
 }
 
 std::string Light::processRequest(const std::string &requestLine){
