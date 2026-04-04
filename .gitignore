@@ -1,2 +1,4 @@
 secret/
 *.exe
+./node_modules
+./.env
