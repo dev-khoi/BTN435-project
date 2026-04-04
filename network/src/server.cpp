@@ -37,7 +37,6 @@ bool Server::start()
     {
         return true;
     }
-
     try
     {
 #ifdef _WIN32
@@ -47,7 +46,7 @@ bool Server::start()
             throw std::runtime_error("WSAStartup failed");
         }
 #endif
-
+        // Performs a standard TCP server setup: socket(), setsockopt(), bind(), listen()
         serverSocket = socket(AF_INET, SOCK_STREAM, 0);
         if (serverSocket < 0)
         {
@@ -61,17 +60,19 @@ bool Server::start()
         serverAddress.sin_family = AF_INET;
         serverAddress.sin_addr.s_addr = INADDR_ANY;
         serverAddress.sin_port = htons(static_cast<uint16_t>(port));
-
+        
+        //   bind() is used to configure a port
         if (bind(serverSocket, reinterpret_cast<sockaddr *>(&serverAddress), sizeof(serverAddress)) < 0)
         {
             throw std::runtime_error("Bind failed");
         }
 
+        //   listen() is used for listening for incoming requests
         if (listen(serverSocket, BACKLOG) < 0)
         {
             throw std::runtime_error("Listen failed");
         }
-
+        // running flag is set to true and worker threads are started
         running.store(true);
         startWorkers();
 
@@ -121,11 +122,13 @@ void Server::stop()
 
 void Server::acceptLoop()
 {
+    // Accept each incoming TCP client and spawn one dedicated handler thread.
     while (running.load())
     {
         sockaddr_in clientAddress{};
         socklen_t clientLen = sizeof(clientAddress);
 
+        // Accepting each incoming TCP client
         int clientSocket = accept(serverSocket, reinterpret_cast<sockaddr *>(&clientAddress), &clientLen);
         if (clientSocket < 0)
         {
@@ -136,16 +139,20 @@ void Server::acceptLoop()
             continue;
         }
 
+        // spawning one dedicated handler thread for each client
         std::lock_guard<std::mutex> lock(clientThreadsMutex);
         clientThreads.emplace_back(&Server::handleClient, this, clientSocket);
     }
 }
 
+// Each client has a dedicated thread that runs handleClient() to receive request lines, 
+// parse command boundaries (\n), call processRequest(), and then send back responses.
 void Server::handleClient(int clientSocket)
 {
     char buffer[BUFFER_SIZE];
     std::string pending;
 
+    // Dedicated client thread: receive lines, split by '\n', process, then send response.
     while (running.load())
     {
         std::memset(buffer, 0, sizeof(buffer));
@@ -226,7 +233,7 @@ std::string Server::processRequest(const std::string &requestLine)
             return makeResponse(400, "ERROR", "Invalid numeric value");
         }
     }
-
+    // Client threads do not execute device logic directly; they enqueue work for workers.
     if (device == "light")
     {
         return dispatchLight(action, hasValue, value);
@@ -308,8 +315,24 @@ std::string Server::dispatchNetwork(const std::string &action, bool hasValue)
     return makeResponse(404, "NOT FOUND", "Unknown network resource");
 }
 
+/**
+ * These functions run in a dedicated thread and continuously processes queued device tasks
+ * tasks until the server stops running and the queue is empty. For each task, it:
+ * 1. Waits for new tasks to be queued or for the server to stop
+ * 2. Retrieves and removes the next task from the queue
+ * 3. Executes the device operation
+ * 4. Resolves the associated future with the execution result
+ * 
+ * The function uses condition variables and mutexes to synchronize access to the shared
+ * task queue between multiple threads. Each task contains a promise that gets fulfilled
+ * with the result, allowing waiting clients to receive responses asynchronously.
+ * 
+ * This function is implemented to run as a background worker thread, not 
+ * directly from the main thread.
+ */
 void Server::lightWorker()
 {
+    // Worker thread consumes queued tasks and resolves futures for waiting clients.
     while (running.load() || !lightQueue.empty())
     {
         DeviceTask task;
@@ -330,8 +353,10 @@ void Server::lightWorker()
     }
 }
 
+
 void Server::thermostatWorker()
 {
+    // Worker thread consumes queued tasks and resolves futures for waiting clients.
     while (running.load() || !thermostatQueue.empty())
     {
         DeviceTask task;
@@ -354,6 +379,7 @@ void Server::thermostatWorker()
 
 void Server::cameraWorker()
 {
+    // Worker thread consumes queued tasks and resolves futures for waiting clients.
     while (running.load() || !cameraQueue.empty())
     {
         DeviceTask task;

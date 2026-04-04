@@ -4,6 +4,7 @@
 Light::Light() : isOn(false) {}
 
 std::string Light::handleCommand(const std::string& action){
+    // Device-local mutex protects shared light state for concurrent requests.
     std::lock_guard<std::mutex> lock(mtx);
 
     if(action == "on"){

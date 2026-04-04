@@ -3,6 +3,7 @@
 Thermostat::Thermostat():temp(21.5f){}
 
 std::string Thermostat::handleCommand(const std::string& action){
+    // Device-local mutex protects temperature reads.
     std::lock_guard<std::mutex> lock(mtx);
 
     if (action == "status") {
@@ -16,6 +17,7 @@ std::string Thermostat::handleCommand(
     const std::string& action,
     const std::string& value
 ){
+    // Device-local mutex protects temperature updates.
     std::lock_guard<std::mutex> lock(mtx);
 
     if(action == "set"){

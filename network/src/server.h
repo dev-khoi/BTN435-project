@@ -51,6 +51,7 @@ private:
     Thermostat thermostatDevice;
     Camera cameraDevice;
     
+    // Server-side synchronization focuses on client/thread and task-queue concurrency.
     std::vector<std::thread> clientThreads;
     std::mutex clientThreadsMutex;
 

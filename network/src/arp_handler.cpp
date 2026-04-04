@@ -4,25 +4,29 @@
 #include <iomanip>
 #include <sstream>
 
+// ArpHandler stores an IP-to-MAC table with interface and status fields. It is protected by tableMutex 
 ArpHandler::ArpHandler()
 {
     std::lock_guard<std::mutex> lock(tableMutex);
     table.clear();
 
+    // Preload resolved entries to simulate ARP table population at startup.
     table["192.168.1.10"] = {"192.168.1.10", "AA:BB:CC:DD:EE:01", "eth0", "Resolved"};
     table["192.168.2.5"] = {"192.168.2.5", "AA:BB:CC:DD:EE:02", "eth1", "Resolved"};
     table["192.168.3.15"] = {"192.168.3.15", "AA:BB:CC:DD:EE:03", "eth1", "Resolved"};
 }
 
+// addOrUpdate() and resolve() support dynamic lookup/update.
 void ArpHandler::addOrUpdate(const std::string &ip, const std::string &mac, const std::string &interfaceName,
                              const std::string &status)
 {
+    // Thread-safe insert/update for dynamic ARP changes.
     std::lock_guard<std::mutex> lock(tableMutex);
     table[ip] = {ip, mac, interfaceName, status};
 }
-
 std::string ArpHandler::resolve(const std::string &ip) const
 {
+    // Thread-safe lookup: resolve IP to MAC.
     std::lock_guard<std::mutex> lock(tableMutex);
     auto it = table.find(ip);
     if (it == table.end())
@@ -48,11 +52,13 @@ std::vector<ArpEntry> ArpHandler::getEntries() const
     return entries;
 }
 
+// formatTable() generates aligned terminal output for GET /network/arp requests 
 std::string ArpHandler::formatTable() const
 {
     const std::vector<ArpEntry> entries = getEntries();
 
     std::ostringstream out;
+    // Generate aligned output used by GET /network/arp responses.
     out << "ARP Table:\n";
     out << std::left
         << std::setw(17) << "IP Address"
