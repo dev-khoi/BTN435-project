@@ -7,10 +7,11 @@ class Light : public Device {
         bool isOn;
         std::mutex mtx;
         std::string handleCommand(const std::string& action) override;
-        std::string handleCommand(const std::string& action, const std::string& value) override;
+        std::string handleCommand(const std::string& action,
+                                  const std::string& value) override;
     public:
+        std::atomic<bool> stopRequested;
         Light();
-        virtual std::string processRequest(const std::string &requestLine) override;
         void run() override;
 };
 

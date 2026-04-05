@@ -10,6 +10,7 @@ class Camera : public Device {
         std::string handleCommand(const std::string& action, const std::string& value) override;
 
     public:
+        std::atomic<bool> stopRequested; 
         Camera();
         void run() override;
 };

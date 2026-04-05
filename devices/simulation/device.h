@@ -7,21 +7,22 @@
 #include <mutex>
 #include <future>
 #include <thread>
+#include <atomic>
+#include <chrono>
 
+// struct DeviceTask
+//             {
+//                 std::string action;
+//                 int value;
+//                 bool hasValue;
+//                 std::promise<std::string> promise;
+//             };
 
 // i want token to auntenication
 inline Utils ul;
 
 class Device {
     private:
-        struct DeviceTask
-            {
-                std::string action;
-                int value;
-                bool hasValue;
-                std::promise<std::string> promise;
-            };
-
         virtual std::string handleCommand(const std::string& action, const std::string& value) = 0;
         virtual std::string handleCommand(const std::string& action) = 0;
     
