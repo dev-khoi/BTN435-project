@@ -43,9 +43,6 @@ std::vector<RouteEntry> RoutingHandler::getRoutes() const
     return out;
 }
 
-/*#CORE LOGIC:
-
-*/ 
 
 RouteDecision RoutingHandler::findRoute(const std::string &destinationIp) const
 {
