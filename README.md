@@ -1,6 +1,6 @@
 ### Overview
 ## Web-based dashboard
-<img width="1070" height="518" alt="image" src="https://github.com/user-attachments/assets/a23825f6-3f0a-4c02-8970-6dfd62639036" />
+<img width="1070" height="518" alt="Screenshot 2026-09-03 101711" src="https://github.com/user-attachments/assets/a98dc4d4-2c8d-420b-9123-1b39a6dc3163" />
 
 ## Architecture diagram
 <img width="574" height="435" alt="image" src="https://github.com/user-attachments/assets/f11ceb3e-20b2-4694-a72a-7d8e7d13b5db" />
